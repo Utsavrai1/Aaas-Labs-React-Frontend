@@ -43,14 +43,10 @@ const NodeConfigDialog = ({
   // Slack config
   const [channel, setChannel] = useState(initialData?.channel || "");
 
-  // Sample GitHub repos (hardcoded for now)
-  const githubRepos = [
-    "user/repo-1",
-    "user/repo-2",
-    "user/repo-3",
-    "organization/project-1",
-    "organization/project-2",
-  ];
+  // GitHub repos
+  const githubRepos: string[] = JSON.parse(
+    localStorage.getItem("repos") || "[]"
+  );
 
   const handleSave = () => {
     let configData = {};

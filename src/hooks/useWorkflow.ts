@@ -1,5 +1,6 @@
 import { BACKEND_URL } from "@/lib/constant";
 import { Workflow } from "@/types/workflow";
+import useAuth from "./useAuth";
 
 const API_URL = `${BACKEND_URL}/api/workflows`;
 
@@ -36,16 +37,20 @@ export const workflowApi = {
         body: JSON.stringify(workflow),
       });
       if (!response.ok) throw new Error("Failed to create workflow");
-      return await response.json();
+      const data = await response.json();
+      return data.workflow;
     } catch (error) {
       console.error("Error creating workflow:", error);
       throw error;
     }
   },
 
-  updateWorkflow: async (workflow: Workflow): Promise<Workflow> => {
+  updateWorkflow: async (
+    workflow: Workflow,
+    username: string
+  ): Promise<Workflow> => {
     try {
-      const response = await fetch(`${API_URL}/${workflow.id}`, {
+      const response = await fetch(`${API_URL}/${username}/${workflow.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

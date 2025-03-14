@@ -5,11 +5,11 @@ import {
   Sun,
   Moon,
   Settings,
-  Bell,
   MoreVertical,
   Menu,
-  FileCodeIcon,
   Workflow,
+  FileText,
+  BookCopy,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -64,9 +64,9 @@ export function Sidebar() {
       <div className="flex-1 px-4">
         <nav className="space-y-1">
           {[
-            { icon: FileCodeIcon, label: "Repository" },
+            { icon: BookCopy, label: "Repository" },
             { icon: Workflow, label: "Workflow" },
-            { icon: Bell, label: "Notification" },
+            { icon: FileText, label: "Report" },
           ].map(({ icon: Icon, label }) => (
             <Button
               key={label}

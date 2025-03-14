@@ -77,6 +77,8 @@ const CreateWorkflowDialog = ({
       // Add to store via API
       const createdWorkflow = await addWorkflow(newWorkflow);
 
+      console.log(createdWorkflow);
+
       setActiveWorkflow(createdWorkflow.id);
 
       // Success notification

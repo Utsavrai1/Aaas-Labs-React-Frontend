@@ -14,7 +14,7 @@ interface WorkflowStore {
   fetchWorkflows: () => Promise<void>;
   fetchWorkflowById: (id: string) => Promise<Workflow | null>;
   addWorkflow: (workflow: Workflow) => Promise<Workflow>;
-  updateWorkflow: (workflow: Workflow) => Promise<void>;
+  updateWorkflow: (workflow: Workflow, username?: string) => Promise<void>;
   deleteWorkflow: (id: string) => Promise<void>;
   setActiveWorkflow: (id: string | null) => void;
   setActiveDataSource: (dataSource: DataSource | null) => void;
@@ -85,10 +85,16 @@ export const useWorkflowStore = create<WorkflowStore>()((set) => ({
     }
   },
 
-  updateWorkflow: async (workflow: Workflow) => {
+  updateWorkflow: async (workflow: Workflow, username?: string) => {
+    if (!username) {
+      return;
+    }
     set({ isLoading: true, error: null });
     try {
-      const updatedWorkflow = await workflowApi.updateWorkflow(workflow);
+      const updatedWorkflow = await workflowApi.updateWorkflow(
+        workflow,
+        username
+      );
       set((state) => ({
         workflows: state.workflows.map((w) =>
           w.id === updatedWorkflow.id ? updatedWorkflow : w

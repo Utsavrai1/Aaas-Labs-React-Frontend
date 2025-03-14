@@ -5,10 +5,11 @@ import {
   Network,
   Database,
   FileCode,
-  MessageSquare,
   Mail,
   Github,
   MessageCircle,
+  Workflow,
+  ShieldQuestion,
 } from "lucide-react";
 import { NodeType } from "@/types/workflow";
 
@@ -46,10 +47,16 @@ const WorkflowNode = memo(({ type, data, isConnectable }: NodeProps) => {
           icon: <FileCode className="w-5 h-5" />,
           color: "bg-green-500",
         };
-      case "talk-to-your-code":
+      case "owasp-vulnerabilities":
         return {
-          label: "Talk to Your Code",
-          icon: <MessageSquare className="w-5 h-5" />,
+          label: "Owasp vulnerabilities",
+          icon: <ShieldQuestion className="w-5 h-5" />,
+          color: "bg-blue-500",
+        };
+      case "flow-chart":
+        return {
+          label: "Flow Chart",
+          icon: <Workflow className="w-5 h-5" />,
           color: "bg-cyan-500",
         };
       case "email":
@@ -86,7 +93,7 @@ const WorkflowNode = memo(({ type, data, isConnectable }: NodeProps) => {
       <div className={`workflow-node-icon ${config.color}`}>{config.icon}</div>
       <div>{config.label}</div>
 
-      {data.config && (
+      {data?.config && (
         <div className="text-xs text-gray-500 mt-1 max-w-full truncate">
           {nodeType === "email" && data.config.email
             ? `To: ${data.config.email}`

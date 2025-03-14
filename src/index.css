@@ -194,3 +194,12 @@
     @apply rounded-lg overflow-hidden shadow-lg border border-gray-100;
   }
 }
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

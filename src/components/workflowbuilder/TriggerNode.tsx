@@ -24,18 +24,20 @@ import { Button } from "@/components/ui/button";
 import { DataSource, Frequency } from "@/types/workflow";
 import { useWorkflowStore } from "@/lib/store";
 import { useReactFlow } from "reactflow";
+import { Input } from "@/components/ui/input";
 
-const TriggerNode = memo(({ data, isConnectable }: NodeProps) => {
+const TriggerNode = memo(({ id, data, isConnectable }: NodeProps) => {
   const [open, setOpen] = useState(false);
   const [dataSource, setDataSource] = useState<DataSource>(
     data?.dataSource || "Domain"
   );
+  const [sourceUrl, setSourceUrl] = useState(data?.sourceUrl || "");
   const [frequency, setFrequency] = useState<Frequency>(
     data?.frequency || "2hr"
   );
   const [showWarning, setShowWarning] = useState(false);
   const { setActiveDataSource } = useWorkflowStore();
-  const { getNodes, getEdges } = useReactFlow();
+  const { getNodes, getEdges, setNodes } = useReactFlow();
 
   const hasConnectedNodes = useCallback(() => {
     const nodes = getNodes();
@@ -50,6 +52,22 @@ const TriggerNode = memo(({ data, isConnectable }: NodeProps) => {
       return;
     }
 
+    setNodes((nodes) =>
+      nodes.map((node) => {
+        if (node.id === id) {
+          return {
+            ...node,
+            data: {
+              dataSource,
+              frequency,
+              sourceUrl,
+            },
+          };
+        }
+        return node;
+      })
+    );
+
     setActiveDataSource(dataSource);
     toast.success("Trigger updated", {
       description: `Data source set to ${dataSource} with ${frequency} frequency`,
@@ -59,7 +77,9 @@ const TriggerNode = memo(({ data, isConnectable }: NodeProps) => {
   }, [
     dataSource,
     frequency,
-    data?.dataSource,
+    sourceUrl,
+    id,
+    setNodes,
     setActiveDataSource,
     hasConnectedNodes,
   ]);
@@ -71,15 +91,19 @@ const TriggerNode = memo(({ data, isConnectable }: NodeProps) => {
           <CalendarClock className="w-5 h-5" />
         </div>
         <div className="workflow-node-label">Trigger</div>
-        <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-          {dataSource === "Domain" ? (
-            <Globe className="w-4 h-4" />
-          ) : (
-            <Github className="w-4 h-4" />
-          )}
-          <span>{dataSource}</span>
-          <span>·</span>
-          <span>{frequency}</span>
+        <div className="mt-2 flex flex-col items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex flex-row items-center gap-1">
+            {dataSource === "Domain" ? (
+              <Globe className="w-4 h-4" />
+            ) : (
+              <Github className="w-4 h-4" />
+            )}
+            <span>{dataSource}</span>
+            <span>·</span>
+            <span>{frequency}</span>
+          </div>
+
+          <span>{sourceUrl}</span>
         </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
@@ -143,6 +167,18 @@ const TriggerNode = memo(({ data, isConnectable }: NodeProps) => {
                         </SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium"> Source Url</label>
+                    <Input
+                      value={sourceUrl}
+                      onChange={(e) => setSourceUrl(e.target.value)}
+                      placeholder="Enter source url"
+                      className="w-full"
+                      name="sourceUrl"
+                      id="sourceUrl"
+                      type="url"
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Frequency</label>

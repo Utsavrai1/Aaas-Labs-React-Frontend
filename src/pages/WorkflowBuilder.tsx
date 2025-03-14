@@ -51,6 +51,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 
 import "reactflow/dist/style.css";
+import useAuth from "@/hooks/useAuth";
 
 const nodeTypes: NodeTypes = {
   trigger: TriggerNode,
@@ -58,7 +59,8 @@ const nodeTypes: NodeTypes = {
   nmap: WorkflowNode,
   sqlmap: WorkflowNode,
   wpscan: WorkflowNode,
-  "talk-to-your-code": WorkflowNode,
+  "owasp-vulnerabilities": WorkflowNode,
+  "flow-chart": WorkflowNode,
   email: WorkflowNode,
   "github-issue": WorkflowNode,
   slack: WorkflowNode,
@@ -69,6 +71,7 @@ const TERMINAL_NODE_TYPES = ["email", "github-issue", "slack"];
 const WorkflowBuilderContent = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const {
     workflows,
     fetchWorkflowById,
@@ -140,18 +143,24 @@ const WorkflowBuilderContent = () => {
             navigate("/");
           }
         }
+
+        const triggerNode = found?.nodes.find(
+          (node) => node.type === "trigger"
+        );
+
+        console.log(triggerNode);
       }
     };
 
     loadWorkflow();
-  }, [id, workflows, fetchWorkflowById, setActiveWorkflow, navigate]);
+  }, []);
 
   const addTriggerNode = useCallback(() => {
     const newNode: WorkflowNodeType = {
       id: `trigger-${uuidv4()}`,
       type: "trigger" as NodeType,
       position: { x: 250, y: 200 },
-      data: { dataSource: "Domain", frequency: "2hr" },
+      data: { dataSource: "Domain", frequency: "2hr", sourceUrl: "" },
     };
 
     setNodes([newNode]);
@@ -280,9 +289,13 @@ const WorkflowBuilderContent = () => {
         "slack",
       ].includes(nodeType);
     } else if (dataSource === "GitHub") {
-      return ["talk-to-your-code", "email", "github-issue", "slack"].includes(
-        nodeType
-      );
+      return [
+        "flow-chart",
+        "owasp-vulnerabilities",
+        "email",
+        "github-issue",
+        "slack",
+      ].includes(nodeType);
     }
 
     return false;
@@ -402,7 +415,22 @@ const WorkflowBuilderContent = () => {
         edges: edges as Edge[],
       };
 
-      await updateWorkflow(updatedWorkflow);
+      const triggerNode = updatedWorkflow.nodes.find(
+        (node) => node.type === "trigger"
+      );
+
+      if (
+        !triggerNode ||
+        !triggerNode.data?.sourceUrl ||
+        !triggerNode.data.sourceUrl.startsWith("https://")
+      ) {
+        toast.error("Trigger node must have a valid HTTPS URL");
+        return;
+      }
+
+      console.log(updatedWorkflow);
+
+      await updateWorkflow(updatedWorkflow, user?.username);
       setWorkflow(updatedWorkflow);
 
       toast.success("Workflow saved", {
@@ -415,7 +443,7 @@ const WorkflowBuilderContent = () => {
   };
 
   const goBack = () => {
-    navigate("/");
+    navigate("/dashboard/workflow");
   };
 
   const deleteSelectedNodes = () => {
@@ -474,6 +502,7 @@ const WorkflowBuilderContent = () => {
     if (activeDataSource === "Domain") {
       return [
         { type: "gobuster", label: "Gobuster" },
+        { type: "nkito", label: "Nkito" },
         { type: "nmap", label: "Nmap" },
         { type: "sqlmap", label: "SQLMap" },
         { type: "wpscan", label: "WPScan" },
@@ -483,7 +512,8 @@ const WorkflowBuilderContent = () => {
       ];
     } else {
       return [
-        { type: "talk-to-your-code", label: "Talk to Your Code" },
+        { type: "owasp-vulnerabilities", label: "Owasp vulnerabilities" },
+        { type: "flow-chart", label: "Flow Chart" },
         { type: "email", label: "Email" },
         { type: "github-issue", label: "GitHub Issue" },
         { type: "slack", label: "Slack" },
@@ -494,6 +524,8 @@ const WorkflowBuilderContent = () => {
   const openNodeConfig = (nodeId: string) => {
     const node = nodes.find((n) => n.id === nodeId);
     if (!node) return;
+
+    console.log(node.type);
 
     if (!TERMINAL_NODE_TYPES.includes(node.type as NodeType)) {
       toast.info("Only terminal nodes can be configured");
@@ -518,18 +550,29 @@ const WorkflowBuilderContent = () => {
   );
 
   const saveNodeConfig = (configData: any) => {
-    if (!configNodeId) return;
+    if (!configNodeId || !configNodeType) return;
 
     setNodes((nds) =>
       nds.map((node) => {
         if (node.id === configNodeId) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              config: configData,
-            },
-          };
+          if (configNodeType === "trigger") {
+            return {
+              ...node,
+              data: configData, // Direct data for trigger
+            };
+          } else if (TERMINAL_NODE_TYPES.includes(configNodeType)) {
+            return {
+              ...node,
+              data: {
+                config: configData, // Wrapped in config for terminal nodes
+              },
+            };
+          } else {
+            return {
+              ...node,
+              data: {}, // Empty data for tool nodes
+            };
+          }
         }
         return node;
       })
@@ -549,7 +592,10 @@ const WorkflowBuilderContent = () => {
           <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-50">
             <div className="text-center">
               <p className="text-destructive mb-4">{error}</p>
-              <Button variant="outline" onClick={() => navigate("/")}>
+              <Button
+                variant="outline"
+                onClick={() => navigate("/dashboard/workflow")}
+              >
                 Return to Dashboard
               </Button>
             </div>
