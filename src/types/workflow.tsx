@@ -1,17 +1,18 @@
 import { Node, Edge } from "reactflow";
 
 export type DataSource = "Domain" | "GitHub";
-export type Frequency = "2hr" | "4hr" | "6hr" | "12hr" | "1 day";
+export type Frequency = "manual" | "2hr" | "4hr" | "6hr" | "12hr" | "1 day";
 
 export type NodeType =
   | "trigger"
   | "gobuster"
-  | "nkito"
+  | "nikto"
   | "nmap"
   | "sqlmap"
   | "wpscan"
   | "owasp-vulnerabilities"
   | "flow-chart"
+  | "condition"
   | "email"
   | "github-issue"
   | "slack";

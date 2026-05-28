@@ -32,7 +32,6 @@ const useAuth = () => {
   }, []);
 
   const loginWithGithub = () => {
-    console.log(BACKEND_URL);
     if (!user) {
       window.location.href = `${BACKEND_URL}/api/auth/github`;
     }
@@ -43,11 +42,12 @@ const useAuth = () => {
       await fetch(`${BACKEND_URL}/api/auth/logout`, {
         credentials: "include",
       });
-      setUser(null);
-      localStorage.removeItem("user");
-      navigate("/logout");
     } catch (error) {
       console.error("Logout failed", error);
+    } finally {
+      setUser(null);
+      localStorage.removeItem("user");
+      navigate("/");
     }
   };
 

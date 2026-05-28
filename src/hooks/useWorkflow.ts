@@ -1,13 +1,12 @@
 import { BACKEND_URL } from "@/lib/constant";
 import { Workflow } from "@/types/workflow";
-import useAuth from "./useAuth";
 
 const API_URL = `${BACKEND_URL}/api/workflows`;
 
 export const workflowApi = {
   getAllWorkflows: async (): Promise<Workflow[]> => {
     try {
-      const response = await fetch(API_URL);
+      const response = await fetch(API_URL, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch workflows");
       return await response.json();
     } catch (error) {
@@ -18,7 +17,7 @@ export const workflowApi = {
 
   getWorkflowById: async (id: string): Promise<Workflow> => {
     try {
-      const response = await fetch(`${API_URL}/${id}`);
+      const response = await fetch(`${API_URL}/${id}`, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch workflow");
       return await response.json();
     } catch (error) {
@@ -31,9 +30,8 @@ export const workflowApi = {
     try {
       const response = await fetch(API_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(workflow),
       });
       if (!response.ok) throw new Error("Failed to create workflow");
@@ -52,9 +50,8 @@ export const workflowApi = {
     try {
       const response = await fetch(`${API_URL}/${username}/${workflow.id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(workflow),
       });
       if (!response.ok) throw new Error("Failed to update workflow");
@@ -69,6 +66,7 @@ export const workflowApi = {
     try {
       const response = await fetch(`${API_URL}/${id}`, {
         method: "DELETE",
+        credentials: "include",
       });
       if (!response.ok) throw new Error("Failed to delete workflow");
     } catch (error) {

@@ -103,7 +103,9 @@ const TriggerNode = memo(({ id, data, isConnectable }: NodeProps) => {
             <span>{frequency}</span>
           </div>
 
-          <span>{sourceUrl}</span>
+          {sourceUrl && (
+            <span className="max-w-[160px] truncate text-center" title={sourceUrl}>{sourceUrl}</span>
+          )}
         </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
@@ -125,7 +127,7 @@ const TriggerNode = memo(({ id, data, isConnectable }: NodeProps) => {
                 <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>Warning</AlertTitle>
                 <AlertDescription>
-                  You cant change the Data source first clear all the node{" "}
+                  Cannot change the data source while nodes are connected. Remove all connected nodes first, then update the trigger.
                 </AlertDescription>
                 <div className="flex mt-4 gap-2">
                   <Button
@@ -192,6 +194,7 @@ const TriggerNode = memo(({ id, data, isConnectable }: NodeProps) => {
                         <SelectValue placeholder="Select frequency" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="manual">Manual only (no schedule)</SelectItem>
                         <SelectItem value="2hr">Every 2 hours</SelectItem>
                         <SelectItem value="4hr">Every 4 hours</SelectItem>
                         <SelectItem value="6hr">Every 6 hours</SelectItem>

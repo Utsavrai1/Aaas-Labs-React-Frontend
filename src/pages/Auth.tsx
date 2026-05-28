@@ -1,5 +1,5 @@
 import { LeftSection } from "@/components/auth/LeftSection";
-import RighSection from "@/components/auth/RighSection";
+import RightSection from "@/components/auth/RightSection";
 import LoadingScreen from "@/components/shared/Loading";
 import ThemeToggleButton from "@/components/shared/ThemeToggleButton";
 import useAuth from "@/hooks/useAuth";
@@ -19,7 +19,7 @@ const Auth = () => {
     <div className="h-screen w-full flex flex-col md:flex-row">
       <ThemeToggleButton />
       <LeftSection />
-      <RighSection />
+      <RightSection />
     </div>
   );
 };

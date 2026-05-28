@@ -9,7 +9,7 @@ import {
   Menu,
   Workflow,
   FileText,
-  BookCopy,
+  Database,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -31,13 +31,13 @@ import useAuth from "@/hooks/useAuth";
 
 export function Sidebar() {
   const navigate = useNavigate();
-  const [activeItem, setActiveItem] = useState("repository");
+  const [activeItem, setActiveItem] = useState("workflow");
   const { theme, setTheme } = useTheme();
   const { user } = useAuth();
 
   useEffect(() => {
     if (window.location.pathname === "/dashboard") {
-      navigate("/dashboard/repository", { replace: true });
+      navigate("/dashboard/workflow", { replace: true });
     }
   }, [navigate]);
 
@@ -64,9 +64,9 @@ export function Sidebar() {
       <div className="flex-1 px-4">
         <nav className="space-y-1">
           {[
-            { icon: BookCopy, label: "Repository" },
-            { icon: Workflow, label: "Workflow" },
+            { icon: Workflow,  label: "Workflow" },
             { icon: FileText, label: "Report" },
+            { icon: Database, label: "Assets" },
           ].map(({ icon: Icon, label }) => (
             <Button
               key={label}
